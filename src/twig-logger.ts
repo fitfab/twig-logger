@@ -1,44 +1,66 @@
-console.log("website:", window.location.href);
-let perfData;
-// capture front-end error
-//Reports JavasScript errors to Haystack
+var socket = io();
+
+let perfData = window.performance.timing;
+
 const loadTime = window.performance.now();
+
+const trackError = ({ message, filename, lineno, error }) => {
+  const detail = {
+    message,
+    filename,
+    lineno,
+    error,
+    url: window.location.href,
+    readyState: document.readyState,
+    referrer: document.referrer,
+    stack: error.stack,
+    historyState: JSON.stringify(window.history.state)
+  };
+
+  if (socket) {
+    socket.emit("error", detail);
+  }
+};
+
+const trackPerf = () => {
+  const perf = {
+    pageLoadTime: perfData.loadEventEnd - perfData.navigationStart,
+    responseTime: perfData.responseEnd - perfData.requestStart,
+    renderTime: perfData.domComplete - perfData.domLoading,
+    url: window.location.href,
+    readyState: document.readyState,
+    referrer: document.referrer,
+    historyState: JSON.stringify(window.history.state)
+  };
+  if (socket) {
+    socket.emit("perf", perf);
+  }
+};
+
+// capture front-end error
 window.addEventListener("error", event => {
-  const { message, filename, lineno, error } = event;
-  const customEvent = new CustomEvent("apperror", {
-    bubbles: true,
-    detail: {
-      message,
-      filename,
-      lineno,
-      error,
-      url: window.location.href,
-      readyState: document.readyState,
-      referrer: document.referrer,
-      stack: error.stack,
-      historyState: JSON.stringify(window.history.state),
-      timeSinceLoad: window.performance.now() - loadTime
-    }
+  trackError(event);
+});
+
+// alternative to DOMContentLoaded
+document.onreadystatechange = event => {
+  if (document.readyState === "complete") {
+    setTimeout(trackPerf, 100);
+  }
+};
+
+if (socket) {
+  socket.on("perf", function(data) {
+    console.log("message: " + data);
+    render(data);
   });
-  // Dispatch the event.
-  window.dispatchEvent(customEvent);
-});
+}
 
-// Listen for the event.
-window.addEventListener("apperror", function(event: CustomEvent) {
-  console.log(event.detail);
-});
-
-window.addEventListener("load", function(event: CustomEvent) {
-  perfData = window.performance.timing;
-  trackPerf(perfData);
-});
-
-const trackPerf = perfData => {
-  var pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
-  console.log("pageLoadTime", pageLoadTime);
-  var connectTime = perfData.responseEnd - perfData.requestStart;
-  console.log("connectTime", connectTime);
-  var renderTime = perfData.domComplete - perfData.domLoading;
-  console.log("renderTime", renderTime);
+const render = data => {
+  const str = `
+    ${data.url} : ${data.pageLoadTime}
+  `;
+  const p = document.createElement("p");
+  p.append(str);
+  document.getElementById("output").append(p);
 };
