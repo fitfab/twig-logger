@@ -645,7 +645,7 @@
   version "1.1.2"
   resolved "https://artnetworldwide.pkgs.visualstudio.com/_packaging/artnet-npm-feed/npm/registry/@nodelib/fs.stat/-/fs.stat-1.1.2.tgz#54c5a964462be3d4d78af631363c18d6fa91ac26"
 
-"@types/body-parser@*":
+"@types/body-parser@*", "@types/body-parser@^1.17.0":
   version "1.17.0"
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.17.0.tgz#9f5c9d9bd04bb54be32d5eb9fc0d8c974e6cf58c"
   dependencies:
@@ -718,6 +718,12 @@
   dependencies:
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
+
+"@types/socket.io@^1.4.38":
+  version "1.4.38"
+  resolved "https://registry.yarnpkg.com/@types/socket.io/-/socket.io-1.4.38.tgz#ee1e16d66242a153e1e27aad5a99e0513c39a0ae"
+  dependencies:
+    "@types/node" "*"
 
 abbrev@1:
   version "1.1.1"
@@ -958,7 +964,7 @@ bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.4.0:
   version "4.11.8"
   resolved "https://artnetworldwide.pkgs.visualstudio.com/_packaging/artnet-npm-feed/npm/registry/bn.js/-/bn.js-4.11.8.tgz#2cde09eb5ee341f484746bb0309b3253b1b1442f"
 
-body-parser@1.18.3:
+body-parser@1.18.3, body-parser@^1.18.3:
   version "1.18.3"
   resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.18.3.tgz#5b292198ffdd553b3a0f20ded0592b956955c8b4"
   dependencies:
