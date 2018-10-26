@@ -2,7 +2,7 @@ var socket = io();
 
 if (socket) {
   socket.on("perf", function(data) {
-    console.log("message: " + data);
+    console.log("message: ", data);
     render(data);
   });
 }
@@ -10,7 +10,7 @@ if (socket) {
 const render = data => {
   const $display = document.getElementById("output");
   const title = document.createElement("h5");
-  const text = `${data.type}: ${data.page.url}`;
+  const text = `${data.type}: ${data.page.url} ${data.page.userAgent}`;
   title.append(text);
 
   for (let key in data) {

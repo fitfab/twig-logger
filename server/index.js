@@ -189,7 +189,7 @@ io.on("connection", function (socket) {
   eventEmitter.on("logger", function (msg) {
     console.log("Count: " + count);
     count++;
-    io.emit("perf", msg);
+    socket.emit("perf", msg);
   });
 });
 server.listen(PORT, function (err) {
