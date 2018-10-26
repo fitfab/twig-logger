@@ -21,9 +21,10 @@
   },
   "scripts": {
     "dev": "parcel ./index.html --open",
+    "prebuild": "rm -rf ./dist",
     "build": "parcel build ./index.html",
-    "preserver": "NODE_ENV=production parcel build ./server/index.ts --no-minify -d server --public-url / --target=node8",
-    "server": "NODE_ENV=production node ./server"
+    "preserver": "NODE_ENV=production parcel build ./server/server.ts --no-minify -d server --public-url / --target=node8",
+    "server": "NODE_ENV=production node ./server/server"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
@@ -34,6 +35,8 @@
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
     "socket.io": "^2.1.1",
-    "socket.io-client": "^2.1.1"
+    "socket.io-client": "^2.1.1",
+    "styled-components": "^4.0.2",
+    "useragent": "^2.3.0"
   }
 }

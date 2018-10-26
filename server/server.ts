@@ -7,6 +7,7 @@ import SocketIO from "socket.io";
 import compression from "compression";
 import morgan from "morgan";
 import helmet from "helmet";
+import useragent from "useragent";
 
 // Event Emitter
 
@@ -59,8 +60,14 @@ app.use(bodyParser.json());
 
 // handles logs
 app.use("/artnetlogger", (req, res, next) => {
-  console.log("req.body", req.body);
-  eventEmitter.emit("logger", req.body);
+  // get user agent
+  const userAgent = useragent.parse(req.headers["user-agent"]);
+  req.body.page.userAgent = userAgent.toString();
+
+  req.body.page.device = userAgent.device.toString();
+
+  // emit event
+  eventEmitter.emit("newpost", req.body);
   res.send(JSON.stringify(req.body, null, 2));
 });
 
@@ -79,10 +86,9 @@ io.on("connection", function(socket) {
   let count = 0;
   console.log(`Connected: ${connected}`);
 
-  eventEmitter.on("logger", msg => {
-    console.log(`Count: ${count}`);
+  eventEmitter.on("newpost", msg => {
     count++;
-    socket.emit("perf", msg);
+    socket.emit("log", msg);
   });
 });
 

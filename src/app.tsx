@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import socketIOClient from "socket.io-client";
-import { object } from "prop-types";
+import { Wrapper, Header, Log } from './ui'
 interface State {
   endpoint: string;
   logs: [];
@@ -21,7 +21,7 @@ class App extends Component<Props, State> {
   componentDidMount() {
     const { endpoint } = this.state;
     const socket = socketIOClient(endpoint);
-    socket.on("perf", (data) => {
+    socket.on("log", (data) => {
       this.setState((prevState, {}) =>({ logs: [...prevState.logs, data }));
       console.log(this.state.logs);
     });
@@ -31,11 +31,15 @@ class App extends Component<Props, State> {
   render() {
     const { logs } = this.state;
     return (
-      <div style={{ textAlign: "center" }}>
-        {logs.reverse().map(log => (
-          <h5>{log.page.url} <b>{log.page.userAgent}</b></h5>
+      <Wrapper>
+        <Header>Dart | </Header>
+        {logs.reverse().map((log, index) => (
+          <Log key={index}>
+            <h4>{log.page.url}</h4> <em>{log.page.userAgent}</em> <b>{log.page.device}</b>
+          </Log>
+          
         ))}
-      </div>
+      </Wrapper>
     );
   }
 }
