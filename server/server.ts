@@ -8,6 +8,7 @@ import compression from "compression";
 import morgan from "morgan";
 import helmet from "helmet";
 import useragent from "useragent";
+import cors from "cors";
 
 // Event Emitter
 
@@ -31,11 +32,14 @@ const io = new SocketIO(server);
 // Check Express default env variable
 const dev = app.get("env") !== "production";
 
+// enable cors
+
 // Point to the build for the static files
 app.use(express.static(distFolder));
 
 // Run Production setup
 if (!dev) {
+  console.log("Prod:", dev);
   // Helmet helps secure the Express apps by setting various HTTP headers.
   // https://www.npmjs.com/package/helmet
   app.use(helmet());
@@ -59,7 +63,7 @@ if (dev) {
 app.use(bodyParser.json());
 
 // handles logs
-app.use("/artnetlogger", (req, res, next) => {
+app.use("/artnetlogger", cors(), (req, res, next) => {
   // get user agent
   const userAgent = useragent.parse(req.headers["user-agent"]);
   req.body.page.userAgent = userAgent.toString();
@@ -95,6 +99,6 @@ io.on("connection", function(socket) {
 server.listen(PORT, err => {
   if (err) throw err;
   console.log(`
-    [ server started on port: ${PORT} ]
+    [ server started on port: http://localhost:${PORT} ]
   `);
 });
