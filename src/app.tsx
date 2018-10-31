@@ -56,15 +56,46 @@ class App extends Component<Props, State> {
                   {log.page.url}
                 </a>
               </p>
-              <em>{log.page.userAgent}</em>{" "}
               <p>
-                <b>Page load:</b>{" "}
+                <em>{log.page.userAgent}</em>
+              </p>
+
+              <p>
+                <b>Network: redirect time:</b>{" "}
+                {(log.perf.redirectEnd - log.perf.redirectStart) / 1000}
+                {"s"}
+              </p>
+              <p>
+                <b>Network: domain look up:</b>{" "}
+                {(log.perf.domainLookupEnd - log.perf.domainLookupStart) / 1000}
+                {"s"}
+              </p>
+              <p>
+                <b>Network: connect Time:</b>{" "}
+                {(log.perf.connectEnd - log.perf.navigationStart) / 1000}
+                {"s"}
+              </p>
+
+              <p>
+                <b>Server: request - response time:</b>{" "}
+                {(log.perf.responseEnd - log.perf.requestStart) / 1000}
+                {"s"}
+              </p>
+              <p>
+                <b>Browser: page load time:</b>{" "}
                 {(log.perf.loadEventEnd - log.perf.navigationStart) / 1000}
+                {"s"}
+              </p>
+              <p>
+                <b>Browser: DOM content loaded:</b>{" "}
+                {(log.perf.domContentLoadedEventEnd -
+                  log.perf.navigationStart) /
+                  1000}
                 {"s"}
               </p>
             </div>
             <LineChart
-              width={600}
+              width={200}
               height={200}
               data={[log.perf]}
               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
