@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import socketIOClient from "socket.io-client";
-import { Wrapper, Header, Log } from "./ui";
+import { Wrapper, Header, Log, FingerPrint } from "./ui";
 
 import {
   LineChart,
@@ -38,81 +38,74 @@ class App extends Component<Props, State> {
     });
   }
 
+  renderPerf(perf) {
+    return (
+      <>
+        <p>
+          <b>Network: Redirect time:</b> {perf.redirectEnd - perf.redirectStart}
+          <em>ms</em>
+        </p>
+        <p>
+          <b>Network: Domain lookup:</b>{" "}
+          {perf.domainLookupEnd - perf.domainLookupStart}
+          <em>ms</em>
+        </p>
+        <p>
+          <b>Network: Total first bite time:</b>
+          {perf.responseStart - perf.navigationStart}
+        </p>
+        <p>
+          <b>Network: Latency:</b>
+          {perf.responseStart - perf.fetchStart}
+        </p>
+        <p>
+          <b>Network: Connect:</b> {perf.connectEnd - perf.connectStart}
+          <em>ms</em>
+        </p>
+
+        <p>
+          <b>{`Server: response time:${perf.responseEnd -
+            perf.requestStart}`}</b>
+          <em>ms</em>
+        </p>
+        <p>
+          <b>Browser: Page load time:</b>{" "}
+          {perf.loadEventEnd - perf.navigationStart}
+          <em>ms</em>
+        </p>
+        <p>
+          <b>Browser: DOM content loaded:</b>{" "}
+          {perf.domContentLoadedEventEnd - perf.navigationStart}
+          <em>ms</em>
+        </p>
+        <p>
+          <b>Browser: Time to interactive:</b>{" "}
+          {perf.domInteractive - perf.domLoading}
+          <em>ms</em>
+        </p>
+      </>
+    );
+  }
+
   render() {
     const { logs } = this.state;
     const size = logs.length;
     return (
       <Wrapper>
         <Header>
-          <h1>D</h1>
-          <b>a</b>
-          <span>rt – Live Performance</span>
+          <FingerPrint margin="0 10px 0 0" color="#00BCD4" />
+          <h1>Digital Footprint</h1>
         </Header>
         {logs.map((log, index) => (
           <Log key={index}>
-            <div>
-              <p>
-                <a href={log.page.url} target="preview">
-                  {log.page.url}
-                </a>
-              </p>
-              <p>
-                <em>{log.page.userAgent}</em>
-              </p>
+            <p>
+              <em>{log.page.userAgent}</em>
+              <a href={log.page.url} target="preview">
+                {log.page.url}
+              </a>
+            </p>
 
-              <p>
-                <b>Network: redirect time:</b>{" "}
-                {(log.perf.redirectEnd - log.perf.redirectStart) / 1000}
-                {"s"}
-              </p>
-              <p>
-                <b>Network: domain look up:</b>{" "}
-                {(log.perf.domainLookupEnd - log.perf.domainLookupStart) / 1000}
-                {"s"}
-              </p>
-              <p>
-                <b>Network: connect Time:</b>{" "}
-                {(log.perf.connectEnd - log.perf.navigationStart) / 1000}
-                {"s"}
-              </p>
-
-              <p>
-                <b>Server: request - response time:</b>{" "}
-                {(log.perf.responseEnd - log.perf.requestStart) / 1000}
-                {"s"}
-              </p>
-              <p>
-                <b>Browser: page load time:</b>{" "}
-                {(log.perf.loadEventEnd - log.perf.navigationStart) / 1000}
-                {"s"}
-              </p>
-              <p>
-                <b>Browser: DOM content loaded:</b>{" "}
-                {(log.perf.domContentLoadedEventEnd -
-                  log.perf.navigationStart) /
-                  1000}
-                {"s"}
-              </p>
-            </div>
-            <LineChart
-              width={200}
-              height={200}
-              data={[log.perf]}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-            >
-              <XAxis dataKey="requestStart" />
-              <YAxis />
-              <CartesianGrid strokeDasharray="3 3" />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="requestStart"
-                stroke="#8884d8"
-                activeDot={{ r: 8 }}
-              />
-              <Line type="monotone" dataKey="responseEnd" stroke="#82ca9d" />
-            </LineChart>
+            <div>{log.perf && this.renderPerf(log.perf)}</div>
           </Log>
         ))}
       </Wrapper>
