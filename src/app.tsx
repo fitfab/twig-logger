@@ -2,16 +2,6 @@ import React, { Component } from "react";
 import socketIOClient from "socket.io-client";
 import { Wrapper, Header, Log, FingerPrint } from "./ui";
 
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend
-} from "recharts";
-
 interface State {
   endpoint: string;
   logs: [];
@@ -94,15 +84,15 @@ class App extends Component<Props, State> {
       <Wrapper>
         <Header>
           <FingerPrint margin="0 10px 0 0" color="#00BCD4" />
-          <h1>Digital Footprint</h1>
+          <h1>Performance Footprint</h1>
         </Header>
         {logs.map((log, index) => (
           <Log key={index}>
             <p>
-              <em>{log.page.userAgent}</em>
               <a href={log.page.url} target="preview">
                 {log.page.url}
               </a>
+              <em>{log.page.userAgent}</em>
             </p>
 
             <div>{log.perf && this.renderPerf(log.perf)}</div>
