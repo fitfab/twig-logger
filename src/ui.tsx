@@ -34,15 +34,40 @@ export const Log = styled.div`
   justify-content: space-between;
   border-bottom: 1px solid #777;
   background: #fafafa;
+  overflow: hidden;
+  height: 45px;
+  transition: all;
+
   &:first-of-type {
-    background: #f0f8ff;
+    background: #fff;
     padding: 20px 5vw;
     margin-top: 42px;
+    height: 100%;
+  }
+  &:hover {
+    height: 100%;
   }
   a {
     display: block;
     text-decoration: none;
     color: #037dde;
+  }
+`;
+
+export const PerfBlock = styled.div`
+  min-width: 40vw;
+`;
+
+export const ErrorBlock = styled.div`
+  background: #f0f8ff;
+  padding: 20px;
+  border: 1px solid red;
+
+  b {
+    color: red;
+  }
+  p {
+    margin: 0;
   }
 `;
 
