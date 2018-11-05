@@ -1,14 +1,60 @@
 import React, { Component } from "react";
 import socketIOClient from "socket.io-client";
-import { Wrapper, Header, Log, FingerPrint } from "./ui";
+import { Wrapper, Header, Log, FingerPrint, ErrorBlock, PerfBlock } from "./ui";
 
 interface State {
   endpoint: string;
-  logs: [];
+  logs: [Log?];
+  error?: JSError;
 }
 
 interface Props {
   title: string;
+}
+
+interface Log {
+  page?: Page;
+  perf?: {
+    connectEnd?: number;
+    connectStart?: number;
+    domComplete?: number;
+    domContentLoadedEventEnd?: number;
+    domContentLoadedEventStart?: number;
+    domInteractive?: number;
+    domLoading?: number;
+    domainLookupEnd?: number;
+    domainLookupStart?: number;
+    fetchStart?: number;
+    loadEventEnd?: number;
+    loadEventStart?: number;
+    navigationStart?: number;
+    redirectEnd?: number;
+    redirectStart?: number;
+    requestStart?: number;
+    responseEnd?: number;
+    responseStart?: number;
+    secureConnectionStart?: number;
+    unloadEventEnd?: number;
+    unloadEventStart?: number;
+  };
+  type?: string;
+}
+
+interface Page {
+  device?: string;
+  historyState?: string;
+  readySate?: string;
+  referrer?: string;
+  url?: string;
+  userAgent?: string;
+}
+
+interface JSError {
+  colno?: number;
+  filename?: string;
+  lineno?: number;
+  message?: string;
+  stack?: any;
 }
 
 class App extends Component<Props, State> {
@@ -22,15 +68,38 @@ class App extends Component<Props, State> {
   componentDidMount() {
     const { endpoint } = this.state;
     const socket = socketIOClient(endpoint);
-    socket.on("log", data => {
-      this.setState((prevState, {}) => ({ logs: [data, ...prevState.logs] }));
-      console.log(this.state.logs);
+
+    socket.on("log", (data: Log) => {
+      console.log("data: ", data);
+      this.setState((prevState, {}) => {
+        return {
+          logs: [data, ...prevState.logs]
+        };
+      });
+      console.log("state: ", this.state);
     });
   }
 
-  renderPerf(perf) {
+  renderPerf(data) {
+    const { error, perf } = data;
     return (
-      <>
+      <PerfBlock>
+        <p>
+          <b>Browser: Page load time:</b>{" "}
+          {perf.loadEventEnd - perf.navigationStart}
+          <em>ms</em>
+        </p>
+        <p>
+          <b>Browser: Time to interactive:</b>{" "}
+          {perf.domInteractive - perf.domLoading}
+          <em>ms</em>
+        </p>
+        <p>
+          <b>Browser: DOM content loaded:</b>{" "}
+          {perf.domContentLoadedEventEnd - perf.navigationStart}
+          <em>ms</em>
+        </p>
+
         <p>
           <b>Network: Redirect time:</b> {perf.redirectEnd - perf.redirectStart}
           <em>ms</em>
@@ -58,22 +127,32 @@ class App extends Component<Props, State> {
             perf.requestStart}`}</b>
           <em>ms</em>
         </p>
+
+        {error && this.renderError(error)}
+      </PerfBlock>
+    );
+  }
+
+  renderError(data) {
+    return (
+      <ErrorBlock>
         <p>
-          <b>Browser: Page load time:</b>{" "}
-          {perf.loadEventEnd - perf.navigationStart}
-          <em>ms</em>
+          <b>Message: </b>
+          {data.message}
         </p>
         <p>
-          <b>Browser: DOM content loaded:</b>{" "}
-          {perf.domContentLoadedEventEnd - perf.navigationStart}
-          <em>ms</em>
+          <b>File name: </b>
+          {data.filename}
         </p>
         <p>
-          <b>Browser: Time to interactive:</b>{" "}
-          {perf.domInteractive - perf.domLoading}
-          <em>ms</em>
+          <b>Line number: </b>
+          {data.lineno}
         </p>
-      </>
+        <p>
+          <b>Col number: </b>
+          {data.colno}
+        </p>
+      </ErrorBlock>
     );
   }
 
@@ -84,7 +163,7 @@ class App extends Component<Props, State> {
       <Wrapper>
         <Header>
           <FingerPrint margin="0 10px 0 0" color="#00BCD4" />
-          <h1>Performance Footprint</h1>
+          <h1>Page Fingerprint</h1>
         </Header>
         {logs.map((log, index) => (
           <Log key={index}>
@@ -95,7 +174,7 @@ class App extends Component<Props, State> {
               <em>{log.page.userAgent}</em>
             </p>
 
-            <div>{log.perf && this.renderPerf(log.perf)}</div>
+            <div>{log.perf && this.renderPerf(log)}</div>
           </Log>
         ))}
       </Wrapper>
