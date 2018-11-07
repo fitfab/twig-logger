@@ -7,6 +7,8 @@ import SocketIO from "socket.io";
 import compression from "compression";
 import morgan from "morgan";
 import helmet from "helmet";
+import useragent from "useragent";
+import cors from "cors";
 
 // Event Emitter
 
@@ -18,23 +20,26 @@ const distFolder = path.resolve(__dirname, "../dist");
 // set the port number
 const PORT = process.env.PORT || 5000;
 
-// 1) Create the web app application with Expressjs
+// 1) Create the web app application with Express
 const app = express();
 
-// 2) create the server
+// 2) Create the server
 const server = createServer(app);
 
 // 3) create socket.io
-const io = new SocketIO(server);
+const io = SocketIO(server);
 
 // Check Express default env variable
 const dev = app.get("env") !== "production";
+
+// enable cors
 
 // Point to the build for the static files
 app.use(express.static(distFolder));
 
 // Run Production setup
 if (!dev) {
+  console.log("Prod:", dev);
   // Helmet helps secure the Express apps by setting various HTTP headers.
   // https://www.npmjs.com/package/helmet
   app.use(helmet());
@@ -57,10 +62,20 @@ if (dev) {
 // parse application/json
 app.use(bodyParser.json());
 
-// handles logs
-app.use("/artnetlogger", (req, res, next) => {
-  console.log("req.body", req.body);
-  eventEmitter.emit("logger", req.body);
+// Handles Performance logs
+app.use("/artnetlogger", cors(), (req, res, next) => {
+  // get user agent
+  const userAgent = useragent.parse(req.headers["user-agent"]);
+  req.body.page.userAgent = userAgent.toString();
+
+  // Attach user agent to the req.body
+  req.body.page.device = userAgent.device.toString();
+
+  // NOTE: we save the payload to DB
+  // append to a log file
+
+  // Emit event with the req.body
+  eventEmitter.emit("newpost", req.body);
   res.send(JSON.stringify(req.body, null, 2));
 });
 
@@ -73,22 +88,21 @@ app.use("*", (req, res, next) => {
 
 let connected = 0;
 
-// log connection
+// Web Socket connection
 io.on("connection", function(socket) {
   connected++;
-  let count = 0;
   console.log(`Connected: ${connected}`);
 
-  eventEmitter.on("logger", msg => {
-    console.log(`Count: ${count}`);
-    count++;
-    socket.emit("perf", msg);
+  // Listen to event "newpost"
+  eventEmitter.on("newpost", msg => {
+    // emits "logs" event to the client.
+    socket.emit("log", msg);
   });
 });
 
 server.listen(PORT, err => {
   if (err) throw err;
   console.log(`
-    [ server started on port: ${PORT} ]
+    [ server started on port: http://localhost:${PORT} ]
   `);
 });

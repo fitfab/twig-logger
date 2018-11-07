@@ -2,5 +2,5 @@ node_modules
 dist
 .cache
 
-server/index.js
-server/index.map
+server/server.js
+server/server.map
