@@ -71,10 +71,11 @@ class App extends Component<Props, State> {
 
     socket.on("log", (data: Log) => {
       console.log("data: ", data);
-      this.setState((prevState, {}) => {
+      this.setState(prevState => {
+        const { logs } = prevState;
         return {
-          logs: [data, ...prevState.logs]
-        };
+          logs: [data, ...logs]
+        } as State;
       });
       console.log("state: ", this.state);
     });
@@ -158,7 +159,6 @@ class App extends Component<Props, State> {
 
   render() {
     const { logs } = this.state;
-    const size = logs.length;
     return (
       <Wrapper>
         <Header>

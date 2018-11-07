@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`App Component renders 1`] = `
+<styled.div>
+  <styled.header>
+    <Component
+      color="#00BCD4"
+      margin="0 10px 0 0"
+    />
+    <h1>
+      Page Fingerprint
+    </h1>
+  </styled.header>
+</styled.div>
+`;
